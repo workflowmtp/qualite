@@ -45,7 +45,7 @@ export default function ConfigControlsPage() {
     const ex = cid ? db.controlLibrary.find((c: any) => c.id === cid) : null;
     const Form = () => {
       const [nm, setNm] = useState(ex?.name || '');
-      const [ty, setTy] = useState(ex?.type || 'measure');
+      const [ty, setTy] = useState<string>(ex?.type || 'measure');
       const [un, setUn] = useState(ex?.unit || '');
       const [tg, setTg] = useState(ex?.target ?? '');
       const [tl, setTl] = useState(ex?.tolerance ?? '');
