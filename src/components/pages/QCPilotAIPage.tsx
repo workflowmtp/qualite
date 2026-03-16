@@ -151,33 +151,50 @@ export default function QCPilotAIPage() {
     try {
       const ctx = buildContext();
       const sp = buildSystemPrompt();
-      const apiMsgs = newMsgs.map((m) => ({
+      const history = newMsgs.map((m) => ({
         role: m.role === 'user' ? 'user' : 'assistant',
         content: m.role === 'user' ? m.content : m.content.replace(/<[^>]+>/g, ''),
       }));
-      const last = apiMsgs[apiMsgs.length - 1];
-      if (last && last.role === 'user') last.content = ctx + '\n\n' + last.content;
 
-      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      const resp = await fetch('/api/ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: sp,
-          messages: apiMsgs,
+          message: msg,
+          context: ctx,
+          systemPrompt: sp,
+          history,
+          user: currentUser?.fullName || '',
+          role: role?.name || '',
+          pole: pole?.name || '',
+          atelier: at?.name || '',
         }),
       });
+
       const data = await resp.json();
       let txt = '';
-      if (data.content && data.content.length > 0) {
-        data.content.forEach((b: { type: string; text: string }) => { if (b.type === 'text') txt += b.text; });
+
+      if (data.output) {
+        txt = data.output;
+      } else if (data.response) {
+        txt = data.response;
+      } else if (data.text) {
+        txt = data.text;
+      } else if (data.message) {
+        txt = data.message;
+      } else if (typeof data === 'string') {
+        txt = data;
+      } else if (Array.isArray(data) && data.length > 0) {
+        txt = data[0]?.output || data[0]?.response || data[0]?.text || JSON.stringify(data[0]);
+      } else {
+        txt = JSON.stringify(data);
       }
-      if (!txt) txt = 'Pas de réponse.';
+
+      if (!txt || txt === '{}' || txt === '[]') txt = 'Pas de réponse de l\'agent.';
       txt = txt.replace(/\n/g, '<br>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
       setAiMessages([...newMsgs, { role: 'assistant', content: txt }]);
     } catch {
-      const fb = fallbackResponse(msg) + '<br><br><em style="color:var(--text-muted);font-size:11px;">Mode local — API indisponible</em>';
+      const fb = fallbackResponse(msg) + '<br><br><em style="color:var(--text-muted);font-size:11px;">Mode local — Agent n8n indisponible</em>';
       setAiMessages([...newMsgs, { role: 'assistant', content: fb }]);
     }
     setSending(false);
