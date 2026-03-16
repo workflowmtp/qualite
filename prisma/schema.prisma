@@ -1,0 +1,246 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id    String @id @default(cuid())
+  name  String
+  level Int    @default(0)
+  permissions String[] @default([])
+  users User[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  fullName  String
+  roleId    String
+  role      Role     @relation(fields: [roleId], references: [id])
+  poles     String[] @default([])
+  ateliers  String[] @default([])
+  active    Boolean  @default(true)
+  resetToken String?
+  resetTokenExpiry DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Pole {
+  id    String @id @default(cuid())
+  name  String
+  code  String @unique
+  color String @default("#3b82f6")
+}
+
+model Atelier {
+  id     String @id @default(cuid())
+  poleId String
+  name   String
+  code   String
+  order  Int    @default(0)
+}
+
+model Machine {
+  id        String  @id @default(cuid())
+  atelierId String
+  name      String
+  active    Boolean @default(true)
+}
+
+model Gamme {
+  id     String   @id @default(cuid())
+  poleId String
+  name   String
+  steps  String[] @default([])
+}
+
+model Transition {
+  id            String  @id @default(cuid())
+  gammeId       String
+  poleId        String
+  fromAtelierId String
+  toAtelierId   String
+  order         Int     @default(0)
+  mandatory     Boolean @default(true)
+}
+
+model Control {
+  id         String  @id @default(cuid())
+  atelierId  String
+  name       String
+  category   String  @default("")
+  type       String  @default("measure")
+  target     Float?
+  tolerance  Float?
+  unit       String?
+  instrument String?
+  frequency  String  @default("chaque_lot")
+  active     Boolean @default(true)
+}
+
+model Client {
+  id   String @id @default(cuid())
+  name String
+  code String @unique
+}
+
+model Product {
+  id       String @id @default(cuid())
+  name     String
+  clientId String
+  poleId   String
+}
+
+model ProductTechSheet {
+  id          String  @id @default(cuid())
+  productId   String
+  atelierId   String
+  controlId   String
+  target      Float?
+  tolerance   Float?
+  isCheck     Boolean @default(false)
+  active      Boolean @default(true)
+  description String?
+}
+
+model Lot {
+  id               String   @id @default(cuid())
+  numLot           String
+  of               String
+  clientId         String
+  productId        String
+  poleId           String
+  gammeId          String
+  quantity         Int      @default(0)
+  currentAtelierId String
+  currentStepIndex Int      @default(0)
+  status           String   @default("brouillon")
+  createdBy        String
+  machine          String   @default("")
+  lotMatiere       String   @default("")
+  bat              String   @default("")
+  observations     String   @default("")
+  customTargets    Json?
+  inks             Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model LotStep {
+  id          String    @id @default(cuid())
+  lotId       String
+  atelierId   String
+  stepIndex   Int
+  status      String    @default("in_progress")
+  enteredAt   DateTime  @default(now())
+  completedAt DateTime?
+  operatorId  String?
+  chefId      String?
+  validatedAt DateTime?
+}
+
+model LotResult {
+  id            String   @id @default(cuid())
+  lotId         String
+  atelierId     String
+  controlId     String
+  isInk         Boolean  @default(false)
+  inkName       String?
+  m1            Float?
+  m2            Float?
+  m3            Float?
+  avg           Float?
+  delta         Float?
+  verdict       String   @default("OK")
+  usedTarget    Float?
+  usedTolerance Float?
+  timestamp     DateTime @default(now())
+  userId        String
+}
+
+model QcResult {
+  id        String   @id @default(cuid())
+  lotId     String
+  atelierId String
+  controlId String
+  m1        Float?
+  m2        Float?
+  m3        Float?
+  avg       Float
+  delta     Float
+  verdict   String
+  timestamp DateTime @default(now())
+  userId    String
+}
+
+model QcDecision {
+  id               String   @id @default(cuid())
+  lotId            String
+  poleId           String
+  atelierId        String
+  decision         String
+  observations     String   @default("")
+  actionsRequises  String   @default("")
+  qcUserId         String
+  timestamp        DateTime @default(now())
+}
+
+model NonConformity {
+  id              String    @id @default(cuid())
+  numero          String
+  poleId          String
+  gammeId         String
+  atelierId       String
+  lotId           String
+  of              String    @default("")
+  type            String
+  gravite         String
+  causePresumee   String    @default("")
+  description     String    @default("")
+  actionsRequises String    @default("")
+  createdBy       String
+  status          String    @default("ouverte")
+  createdAt       DateTime  @default(now())
+  closedAt        DateTime?
+}
+
+model Draft {
+  id            String   @id @default(cuid())
+  poleId        String
+  gammeId       String
+  atelierId     String
+  of            String   @default("")
+  clientId      String
+  productId     String
+  quantity      Int      @default(0)
+  machine       String   @default("")
+  lotMatiere    String   @default("")
+  bat           String   @default("")
+  observations  String   @default("")
+  measures      Json?
+  checks        Json?
+  customTargets Json?
+  inks          Json?
+  createdBy     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  role      String   @default("")
+  action    String
+  entity    String?
+  oldValue  String?
+  newValue  String?
+  poleId    String   @default("")
+  atelierId String   @default("")
+  timestamp DateTime @default(now())
+}
