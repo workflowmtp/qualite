@@ -35,7 +35,7 @@ export default function NonConformitesPage() {
       ...d,
       nonConformities: d.nonConformities.map((n) =>
         n.id === nid
-          ? { ...n, status: ns, closedAt: ns === 'cloturee' ? Date.now() : n.closedAt }
+          ? { ...n, status: ns as NonConformity['status'], closedAt: ns === 'cloturee' ? Date.now() : n.closedAt }
           : n
       ),
     }));

@@ -65,7 +65,7 @@ export default function QCPilotAIPage() {
         ctx += `${l.numLot} | ${l.of} | ${(l.observations || '').substring(0, 60)}\n`;
         getLotResults(l.id).filter((r) => r.verdict === 'NOK').forEach((r) => {
           const ct = db.controlLibrary.find((x) => x.id === r.controlId);
-          ctx += `  NOK: ${ct?.name || ''} moy=${r.avg.toFixed(2)}\n`;
+          ctx += `  NOK: ${ct?.name || ''} moy=${r.avg != null ? r.avg.toFixed(2) : 'N/A'}\n`;
         });
       });
     }

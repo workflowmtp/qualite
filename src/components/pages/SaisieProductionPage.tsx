@@ -229,14 +229,14 @@ export default function SaisieProductionPage() {
         const newLot = {
           id: newLotId, numLot: nl, of: data.of, clientId: data.clientId, productId: data.productId,
           poleId: currentPoleId || '', gammeId: data.gammeId, quantity: Number(data.quantity) || 0,
-          currentAtelierId: fa, currentStepIndex: si, status: 'soumis',
+          currentAtelierId: fa, currentStepIndex: si, status: 'soumis' as const,
           createdBy: currentUser?.id || '', createdAt: Date.now(), updatedAt: Date.now(),
           machine: data.machine, lotMatiere: data.lotMatiere, bat: data.bat,
           observations: data.observations, customTargets: data.customTargets, inks: data.inks,
         };
         const newStep = {
           id: generateId(), lotId: newLotId, atelierId: fa, stepIndex: si,
-          status: 'in_progress', enteredAt: Date.now(), completedAt: null,
+          status: 'in_progress' as const, enteredAt: Date.now(), completedAt: null,
           operatorId: currentUser?.id || '', chefId: null, validatedAt: null,
         };
         let drafts = d.drafts;

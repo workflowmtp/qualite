@@ -67,7 +67,7 @@ export default function LotsEntrantsPage() {
     updateDB((d) => {
       const newSteps = d.lotSteps.map((s) =>
         s.lotId === lid && s.status === 'in_progress'
-          ? { ...s, status: 'completed', completedAt: Date.now() }
+          ? { ...s, status: 'completed' as const, completedAt: Date.now() }
           : s
       );
       newSteps.push({
@@ -75,7 +75,7 @@ export default function LotsEntrantsPage() {
         lotId: lid,
         atelierId: nxt,
         stepIndex: nI,
-        status: 'in_progress',
+        status: 'in_progress' as const,
         enteredAt: Date.now(),
         completedAt: null,
         operatorId: currentUser?.id || '',
@@ -86,7 +86,7 @@ export default function LotsEntrantsPage() {
         ...d,
         lots: d.lots.map((l) =>
           l.id === lid
-            ? { ...l, currentAtelierId: nxt, currentStepIndex: nI, status: 'brouillon', updatedAt: Date.now() }
+            ? { ...l, currentAtelierId: nxt, currentStepIndex: nI, status: 'brouillon' as const, updatedAt: Date.now() }
             : l
         ),
         lotSteps: newSteps,

@@ -112,7 +112,7 @@ export default function ConfigControlsPage() {
     const ex = tid ? db.productTechSheets.find((t: any) => t.id === tid) : null;
     const Form = () => {
       const [ci, setCi] = useState(ex?.controlId || '');
-      const [cli, setCli] = useState(ex?.clientId || '');
+      const [ai, setAi] = useState(ex?.atelierId || '');
       const [pi, setPi] = useState(ex?.productId || '');
       const [tg, setTg] = useState(ex?.target ?? '');
       const [tl, setTl] = useState(ex?.tolerance ?? '');
@@ -127,16 +127,16 @@ export default function ConfigControlsPage() {
               </select>
             </div>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-              <div className="form-group"><label>Client</label>
-                <select className="form-control" value={cli} onChange={e => setCli(e.target.value)}>
+              <div className="form-group"><label>Atelier</label>
+                <select className="form-control" value={ai} onChange={e => setAi(e.target.value)}>
                   <option value="">--</option>
-                  {db.clients.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  {db.ateliers.map((a: any) => <option key={a.id} value={a.id}>{a.name}</option>)}
                 </select>
               </div>
               <div className="form-group"><label>Produit</label>
                 <select className="form-control" value={pi} onChange={e => setPi(e.target.value)}>
                   <option value="">--</option>
-                  {db.products.filter((p: any) => !cli || p.clientId === cli).map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  {db.products.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
                 </select>
               </div>
             </div>
@@ -147,7 +147,7 @@ export default function ConfigControlsPage() {
           </div>
           <div className="modal-footer">
             <button className="btn btn-secondary" onClick={closeModal}>Annuler</button>
-            <button className="btn btn-primary" onClick={() => saveTechSheet(tid||null, { controlId:ci, clientId:cli, productId:pi, target:tg!==''?Number(tg):null, tolerance:tl!==''?Number(tl):null })}>Enregistrer</button>
+            <button className="btn btn-primary" onClick={() => saveTechSheet(tid||null, { controlId:ci, atelierId:ai, productId:pi, target:tg!==''?Number(tg):null, tolerance:tl!==''?Number(tl):null })}>Enregistrer</button>
           </div>
         </div>
       );

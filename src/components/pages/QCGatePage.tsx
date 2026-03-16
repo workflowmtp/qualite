@@ -141,7 +141,7 @@ export default function QCGatePage() {
 
       const updatedSteps = d.lotSteps.map((s) =>
         s.lotId === lotId && s.status === 'in_progress' && dec === 'libere'
-          ? { ...s, status: 'completed', completedAt: Date.now() }
+          ? { ...s, status: 'completed' as const, completedAt: Date.now() }
           : s
       );
 
@@ -160,7 +160,7 @@ export default function QCGatePage() {
           type: 'Produit', gravite: 'Majeure', causePresumee: '',
           description: 'NC auto - Blocage ' + lot.numLot + (obs ? ' - ' + obs : ''),
           actionsRequises: acts || 'À définir',
-          createdBy: currentUser?.id || '', createdAt: Date.now(), closedAt: null, status: 'ouverte',
+          createdBy: currentUser?.id || '', createdAt: Date.now(), closedAt: null, status: 'ouverte' as const,
         });
       }
 
