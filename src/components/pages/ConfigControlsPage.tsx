@@ -85,17 +85,17 @@ export default function ConfigControlsPage() {
   };
 
   // --- Tech Sheets ---
-  const fTS = db.techSheets.filter((t: any) =>
+  const fTS = db.productTechSheets.filter((t: any) =>
     !search || t.controlId.toLowerCase().includes(search.toLowerCase()) || t.clientId.toLowerCase().includes(search.toLowerCase())
   );
 
   const saveTechSheet = (id: string|null, d: any) => {
     if (id) {
-      updateDB((s: any) => ({ ...s, techSheets: s.techSheets.map((t: any) => t.id === id ? { ...t, ...d } : t) }));
+      updateDB((s: any) => ({ ...s, productTechSheets: s.productTechSheets.map((t: any) => t.id === id ? { ...t, ...d } : t) }));
       addAuditLog('techsheet.edit', id, null, '');
     } else {
       const nid = generateId();
-      updateDB((s: any) => ({ ...s, techSheets: [...s.techSheets, { id: nid, ...d }] }));
+      updateDB((s: any) => ({ ...s, productTechSheets: [...s.productTechSheets, { id: nid, ...d }] }));
       addAuditLog('techsheet.create', nid, null, '');
     }
     closeModal(); showToast(id ? 'FT modifiée' : 'FT créée', 'success');
@@ -103,13 +103,13 @@ export default function ConfigControlsPage() {
 
   const delTS = (id: string) => {
     if (!hasPermission('config.techsheets.edit')) { showToast('Permission refusée', 'error'); return; }
-    updateDB((s: any) => ({ ...s, techSheets: s.techSheets.filter((t: any) => t.id !== id) }));
+    updateDB((s: any) => ({ ...s, productTechSheets: s.productTechSheets.filter((t: any) => t.id !== id) }));
     addAuditLog('techsheet.delete', id, null, ''); showToast('FT supprimée', 'success');
   };
 
   const openTSForm = (tid?: string) => {
     if (!hasPermission('config.techsheets.edit')) { showToast('Permission refusée', 'error'); return; }
-    const ex = tid ? db.techSheets.find((t: any) => t.id === tid) : null;
+    const ex = tid ? db.productTechSheets.find((t: any) => t.id === tid) : null;
     const Form = () => {
       const [ci, setCi] = useState(ex?.controlId || '');
       const [cli, setCli] = useState(ex?.clientId || '');
@@ -168,7 +168,7 @@ export default function ConfigControlsPage() {
 
       <div style={{ display:'flex', gap:6, marginBottom:14 }}>
         <button className={`btn ${tab==='controls'?'btn-primary':'btn-secondary'} btn-sm`} onClick={() => setTab('controls')}>Contrôles ({db.controlLibrary.length})</button>
-        <button className={`btn ${tab==='techsheets'?'btn-primary':'btn-secondary'} btn-sm`} onClick={() => setTab('techsheets')}>Fiches Techniques ({db.techSheets.length})</button>
+        <button className={`btn ${tab==='techsheets'?'btn-primary':'btn-secondary'} btn-sm`} onClick={() => setTab('techsheets')}>Fiches Techniques ({db.productTechSheets.length})</button>
       </div>
 
       {tab === 'controls' && (
